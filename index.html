@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthXML Portal - SaaS Software Download</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          animation: {
+            'shimmer': 'shimmer 2s linear infinite',
+          },
+          keyframes: {
+            shimmer: {
+              from: { backgroundPosition: '200% 0' },
+              to: { backgroundPosition: '-200% 0' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent; 
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #d1d5db; 
+      border-radius: 4px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #4b5563; 
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af; 
+    }
+    
+    /* Skeleton Shimmer Effect */
+    .skeleton {
+      background: #f6f7f8;
+      background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+      background-repeat: no-repeat;
+      background-size: 800px 100%; 
+      animation-duration: 1.5s;
+      animation-fill-mode: forwards; 
+      animation-iteration-count: infinite;
+      animation-name: shimmer;
+      animation-timing-function: linear;
+    }
+    
+    .dark .skeleton {
+      background: #1f2937;
+      background-image: linear-gradient(to right, #1f2937 0%, #374151 20%, #1f2937 40%, #1f2937 100%);
+    }
+
+    /* Modal Backdrop Blur */
+    .modal-backdrop {
+      backdrop-filter: blur(4px);
+    }
+    
+    /* Smooth Scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "lucide-react": "https://esm.sh/lucide-react@0.292.0"
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+  <div id="root"></div>
+
+  <script type="text/babel" data-type="module">
+    import React, { useState, useEffect, useMemo } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { 
+      Search, ShieldCheck, RefreshCw, Key, Database, Search as SearchIcon, 
+      Download, BookOpen, CheckCircle, Moon, Sun, X, Copy, ChevronRight, Monitor, Apple, Check
+    } from 'lucide-react';
+
+    // Sample Data
+    const softwareData = [
+      {
+        id: 1,
+        name: "XML BHYT Toolkit",
+        version: "R1.3",
+        isNew: true,
+        size: "~60 MB",
+        downloads: "98,280",
+        os: "Windows",
+        category: "Công cụ XML",
+        description: "Công cụ kiểm tra lỗi cú pháp và logic chuẩn XML 4210 và 130 của Bộ Y Tế. Tự động phát hiện lỗi sai lệch thông tin hành chính, chi tiết thuốc và dịch vụ kỹ thuật.",
+        icon: "ShieldCheck",
+        updatedAt: "2026-04-15",
+        md5: "",
+        downloadUrl: "https://github.com/vantung74119/healthXML/releases/download/v1.0/XML.BHYT.Toolkit.Setup.R1.3.7z",
+        changelog: [
+          { version: "R1.3", date: "2026-04-15", notes: "Cập nhật bộ quy tắc kiểm tra theo QĐ 130." },
+    
+        ]
+      },
+      {
+        id: 2,
+        name: "XML Reported Tool",
+        version: "v3.0.1",
+        isNew: true,
+        size: "~70 MB",
+        downloads: "21,000",
+        os: "Windows",
+        category: "Công cụ XML",
+        description: "Phần mềm xuất báo có Thủ thuật - CDHA - XN từ XML chuẩn 130",
+        icon: "Database",
+        updatedAt: "2026-04-15",
+        md5: "",
+        downloadUrl: "https://github.com/vantung74119/healthXML/releases/download/v1.0/BHYT.XML.Reported.7z",
+        changelog: [
+          { version: "Final", date: "2024-05-1" , notes: "Xuất file theo nhóm và ALL" },
+        
+        ]
+      },
+      {
+        id: 3,
+        name: "Tra cứu thông tin thẻ BHYT & LSKCB",
+        version: "V3.5",
+        isNew: true,
+        size: "~30 MB",
+        downloads: "5,420",
+        os: "Windows",
+        category: "Tiện ích",
+        description: "Công cụ nhỏ gọn giúp nhân viên tiếp đón tra cứu thông tin thẻ BHYT trực tiếp thông qua API của BHXH mà không cần đăng nhập cổng.",
+        icon: "Search",
+        updatedAt: "2026-04-15",
+        md5: "",
+        downloadUrl: "https://github.com/vantung74119/healthXML/releases/download/v1.0/BHYT.API.Checkin.7z",
+        changelog: [
+          { version: "v3.5", date: "2026-04-15", notes: "Cập nhật API tra cứu BHYT mới nhất cuae BHXH" }
+        ]
+      },
+      {
+        id: 4,
+        name: "XML Data Extractor (XML Toolkit Lite version)",
+        version: "v1.0",
+        isNew: true,
+        size: "~269 MB",
+        downloads: "3,100",
+        os: "Windows",
+        category: "Công cụ XML",
+        description: "Công cụ hỗ trợ trích xuất dữ liệu từ XML His nội bộ ra file Excel và mã hóa 2 chiều ngược lại XML và ký số chuẩn 3176.",
+        icon: "Database",
+        updatedAt: "2026-04-15",
+        md5: "",
+        downloadUrl: "https://github.com/vantung74119/healthXML/releases/download/v1.0/XML_BHYT_Toolkit_Lite.7z",
+        changelog: [
+          { version: "v1.0", date: "2026-04-15", notes: "Tối ưu hóa xuất/tạo file và ký số XML" }
+        ]
+      },
+      {
+        id: 5,
+        name: "XML Converter Tool",
+        version: "AIO",
+        isNew: true,
+        size: "~45 MB",
+        downloads: "3,100",
+        os: "Windows",
+        category: "Công cụ XML",
+        description: "Công cụ hỗ trợ xuất mẫu, chuyển đổi danh mục XML, hỗ trợ ký số và đồng bộ danh mục lên cổng BHXH qua API - TT12-BTC",
+        icon: "RefreshCw",
+        updatedAt: "2026-04-15",
+        md5: "",
+        downloadUrl: "https://github.com/vantung74119/healthXML/releases/download/v1.0/XML.Converter.7z",
+        changelog: [
+          { version: "v1.0", date: "2026-04-15", notes: "update đồng bộ qua API" }
+        ]
+      }
+    ];
+
+    const iconMap = {
+      ShieldCheck: <ShieldCheck className="w-8 h-8" />,
+      RefreshCw: <RefreshCw className="w-8 h-8" />,
+      Key: <Key className="w-8 h-8" />,
+      Search: <SearchIcon className="w-8 h-8" />,
+      Database: <Database className="w-8 h-8" />
+    };
+
+    const categories = ["Tất cả", "Công cụ XML", "Hệ thống", "Tiện ích"];
+
+    // Header Component
+    const Header = ({ darkMode, setDarkMode }) => (
+      <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/70 dark:bg-gray-950/70 border-b border-gray-200 dark:border-gray-800 transition-colors">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-xl">
+              <Database className="w-5 h-5" />
+            </div>
+            <span className="font-bold text-xl tracking-tight text-gray-900 dark:text-white">Health<span className="text-blue-600 dark:text-blue-400">XML</span></span>
+          </div>
+          <nav className="hidden md:flex gap-6 text-sm font-medium text-gray-600 dark:text-gray-300">
+            <a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Phần mềm</a>
+            <a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Tài liệu</a>
+            <a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Hỗ trợ</a>
+          </nav>
+          <div>
+            <button 
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-300"
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+      </header>
+    );
+
+    // Skeleton Component
+    const SkeletonCard = () => (
+      <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col h-full">
+        <div className="flex justify-between items-start mb-4">
+          <div className="w-14 h-14 rounded-xl skeleton"></div>
+          <div className="w-16 h-6 rounded-full skeleton"></div>
+        </div>
+        <div className="w-3/4 h-6 rounded skeleton mb-2"></div>
+        <div className="w-1/2 h-4 rounded skeleton mb-4"></div>
+        <div className="space-y-2 mb-6">
+          <div className="w-full h-3 rounded skeleton"></div>
+          <div className="w-full h-3 rounded skeleton"></div>
+          <div className="w-5/6 h-3 rounded skeleton"></div>
+        </div>
+        <div className="mt-auto grid grid-cols-2 gap-3">
+          <div className="h-10 rounded-lg skeleton"></div>
+          <div className="h-10 rounded-lg skeleton"></div>
+        </div>
+      </div>
+    );
+
+    
+    const SoftwareCard = ({ item, onOpenModal }) => (
+      <div className="group bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10 dark:hover:shadow-blue-900/20 transition-all duration-300 flex flex-col h-full relative overflow-hidden cursor-pointer" onClick={() => onOpenModal(item)}>
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+        
+        <div className="flex justify-between items-start mb-5 relative z-10">
+          <div className="w-14 h-14 rounded-xl bg-blue-50 dark:bg-gray-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-sm border border-blue-100 dark:border-gray-700 group-hover:scale-110 transition-transform duration-300">
+            {iconMap[item.icon]}
+          </div>
+          {item.isNew && (
+            <span className="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-semibold rounded-full shadow-sm">
+              Mới nhất
+            </span>
+          )}
+        </div>
+        
+        <div className="relative z-10">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            {item.name}
+          </h3>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">
+              {item.version}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">• Cập nhật: {item.updatedAt}</span>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-5 line-clamp-3">
+            {item.description}
+          </p>
+          
+          <div className="flex flex-wrap gap-y-2 gap-x-4 mb-6 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-1.5">
+              <Download className="w-3.5 h-3.5" />
+              <span>{item.downloads}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Database className="w-3.5 h-3.5" />
+              <span>{item.size}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Monitor className="w-3.5 h-3.5" />
+              <span>{item.os}</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* KHU VỰC 2 NÚT ĐÃ ĐƯỢC FIX */}
+        <div className="mt-auto grid grid-cols-2 gap-3 relative z-10">
+          {/* Nút 1: Tải về (Dùng link thật) */}
+          <a 
+            href={item.downloadUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()} 
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-2.5 px-4 rounded-xl font-medium transition-all shadow-md shadow-blue-500/20 active:scale-95 text-sm"
+          >
+            <Download className="w-4 h-4" />
+            <span>Tải về</span>
+          </a>
+
+          {/* Nút 2: Hướng dẫn (Mở Modal) */}
+          <button 
+            onClick={(e) => { e.stopPropagation(); onOpenModal(item); }}
+            className="flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 py-2.5 px-4 rounded-xl font-medium transition-all active:scale-95 text-sm"
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>Hướng dẫn</span>
+          </button>
+        </div>
+      </div>
+    );
+
+    // Modal Component
+    const Modal = ({ isOpen, onClose, item }) => {
+      const [copied, setCopied] = useState(false);
+
+      useEffect(() => {
+        if (isOpen) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = 'auto';
+        }
+        return () => { document.body.style.overflow = 'auto'; };
+      }, [isOpen]);
+
+      if (!isOpen || !item) return null;
+
+      const handleCopy = () => {
+        navigator.clipboard.writeText(item.md5);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+          <div 
+            className="absolute inset-0 bg-gray-900/60 dark:bg-black/60 modal-backdrop transition-opacity"
+            onClick={onClose}
+          ></div>
+          
+          <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-200 border border-gray-200 dark:border-gray-800">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-gray-800 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                  {iconMap[item.icon]}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    {item.name}
+                    <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">
+                      {item.version}
+                    </span>
+                  </h2>
+                  <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 mt-1">
+                    <CheckCircle className="w-4 h-4" />
+                    <span className="font-medium">Verified by Admin • Virus Free</span>
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={onClose}
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto flex-1 bg-gray-50/50 dark:bg-gray-900/50">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                {/* Left Col: Info & Guide */}
+                <div className="md:col-span-2 space-y-8">
+                  <section>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Thông tin chi tiết</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                      {item.description}
+                    </p>
+                  </section>
+
+                  <section>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Hướng dẫn cài đặt nhanh</h3>
+                    <div className="relative border-l-2 border-blue-100 dark:border-blue-900/50 ml-3 space-y-6">
+                      <div className="relative pl-6">
+                        <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-blue-500 border-4 border-gray-50 dark:border-gray-900"></div>
+                        <h4 className="font-medium text-gray-900 dark:text-white text-sm">Bước 1: Tải và Giải nén</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Tải file cài đặt về máy, sau đó nhấp chuột phải chọn "Extract Here" hoặc "Giải nén tại đây".</p>
+                      </div>
+                      <div className="relative pl-6">
+                        <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-blue-500 border-4 border-gray-50 dark:border-gray-900"></div>
+                        <h4 className="font-medium text-gray-900 dark:text-white text-sm">Bước 2: Chạy File Cài Đặt</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Chạy file <code>setup.exe</code> với quyền Administrator. Nhấn "Next" cho đến khi hoàn thành.</p>
+                      </div>
+                      <div className="relative pl-6">
+                        <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-blue-500 border-4 border-gray-50 dark:border-gray-900"></div>
+                        <h4 className="font-medium text-gray-900 dark:text-white text-sm">Bước 3: Kiểm tra tính toàn vẹn</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Sử dụng mã MD5 bên dưới để đảm bảo file tải về không bị lỗi hay can thiệp.</p>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+
+                {/* Right Col: Details & Hash */}
+                <div className="space-y-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Kiểm tra File (MD5)</h4>
+                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-900 p-2 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <code className="text-xs text-gray-600 dark:text-gray-400 font-mono truncate flex-1">{item.md5}</code>
+                      <button 
+                        onClick={handleCopy}
+                        className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 transition-colors"
+                        title="Copy to clipboard"
+                      >
+                        {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {copied && <p className="text-xs text-green-500 mt-2 font-medium">Đã sao chép!</p>}
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Lịch sử phiên bản</h4>
+                    <ul className="space-y-3">
+                      {item.changelog.map((log, idx) => (
+                        <li key={idx} className="border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0 last:pb-0">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">{log.version}</span>
+                            <span className="text-[10px] text-gray-500">{log.date}</span>
+                          </div>
+                          <p className="text-[11px] text-gray-600 dark:text-gray-400">{log.notes}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 flex justify-end gap-3">
+              <button 
+                onClick={onClose}
+                className="px-5 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                Đóng
+              </button>
+              <a 
+                href={item.downloadUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-2 px-6 rounded-lg font-medium transition-all shadow-md"
+              >
+                <Download className="w-4 h-4" />
+                <span>Tải Ngay</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // Main App Component
+    const App = () => {
+      const [darkMode, setDarkMode] = useState(false);
+      const [searchQuery, setSearchQuery] = useState("");
+      const [activeCategory, setActiveCategory] = useState("Tất cả");
+      const [isLoading, setIsLoading] = useState(true);
+      const [selectedItem, setSelectedItem] = useState(null);
+
+      useEffect(() => {
+        // Toggle dark mode class on html
+        if (darkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }, [darkMode]);
+
+      useEffect(() => {
+        // Simulate data fetching
+        const timer = setTimeout(() => {
+          setIsLoading(false);
+        }, 1200);
+        return () => clearTimeout(timer);
+      }, []);
+
+      const filteredData = useMemo(() => {
+        return softwareData.filter(item => {
+          const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                item.description.toLowerCase().includes(searchQuery.toLowerCase());
+          const matchesCategory = activeCategory === "Tất cả" || item.category === activeCategory;
+          return matchesSearch && matchesCategory;
+        });
+      }, [searchQuery, activeCategory]);
+
+      return (
+        <div className="min-h-screen flex flex-col font-sans">
+          <Header darkMode={darkMode} setDarkMode={setDarkMode} />
+
+          <main className="flex-1">
+            {/* Hero Section */}
+            <section className="relative pt-20 pb-16 px-4 overflow-hidden">
+              <div className="absolute inset-0 bg-blue-50/50 dark:bg-blue-900/10 -z-10 transition-colors"></div>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-blue-400/20 dark:bg-blue-600/20 blur-[100px] rounded-full -z-10"></div>
+              
+              <div className="container mx-auto max-w-4xl text-center">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">
+                  Công Cụ Dữ Liệu <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Y Tế & BHYT</span>
+                </h1>
+                <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
+                  Kho phần mềm chuyên dụng hỗ trợ kiểm tra XML, chuẩn hóa dữ liệu 130 và đồng bộ cổng giám định BHYT hiệu quả nhất.
+                </p>
+
+                {/* Search Bar */}
+                <div className="relative max-w-2xl mx-auto mb-10 group">
+                  <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                    <Search className="w-5 h-5" />
+                  </div>
+                  <input 
+                    type="text" 
+                    className="w-full pl-14 pr-12 py-4 rounded-2xl border-2 border-white dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-xl shadow-blue-500/5 dark:shadow-blue-900/10 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all text-lg"
+                    placeholder="Tìm kiếm nhanh phần mềm, tính năng..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  {searchQuery && (
+                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                      <button onClick={() => setSearchQuery("")} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Categories */}
+                <div className="flex flex-wrap justify-center gap-3">
+                  {categories.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                        activeCategory === cat 
+                          ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-lg transform scale-105' 
+                          : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 shadow-sm'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Software Grid */}
+            <section className="py-8 px-4 container mx-auto max-w-7xl">
+              <div className="mb-8 flex justify-between items-end">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Danh sách phần mềm</h2>
+                  <p className="text-gray-500 dark:text-gray-400 mt-1">Hiển thị {isLoading ? "..." : filteredData.length} kết quả</p>
+                </div>
+              </div>
+
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
+                </div>
+              ) : filteredData.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredData.map(item => (
+                    <SoftwareCard 
+                      key={item.id} 
+                      item={item} 
+                      onOpenModal={setSelectedItem} 
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                    <Search className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Không tìm thấy phần mềm nào</h3>
+                  <p className="text-gray-500 dark:text-gray-400">Vui lòng thử từ khóa khác hoặc xóa bộ lọc danh mục.</p>
+                  <button 
+                    onClick={() => {setSearchQuery(""); setActiveCategory("Tất cả");}}
+                    className="mt-6 px-6 py-2.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                  >
+                    Xóa tất cả bộ lọc
+                  </button>
+                </div>
+              )}
+            </section>
+          </main>
+
+          <footer className="border-t border-gray-200 dark:border-gray-800 py-8 bg-white dark:bg-gray-950 mt-auto transition-colors">
+            <div className="container mx-auto px-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+              <p>© 2024 HealthXML. All rights reserved. Designed and developed by Bùi Văn Tùng.</p>
+            </div>
+          </footer>
+
+          <Modal 
+            isOpen={!!selectedItem} 
+            onClose={() => setSelectedItem(null)} 
+            item={selectedItem} 
+          />
+        </div>
+      );
+    };
+
+    const root = createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
